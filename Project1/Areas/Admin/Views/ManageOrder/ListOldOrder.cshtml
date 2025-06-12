@@ -1,0 +1,308 @@
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@using Project1.Models;
+@using X.PagedList.Mvc.Core;
+@model X.PagedList.IPagedList<TOrder>
+
+@{
+    ViewData["Title"] = "ListProduct";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin1.cshtml";
+}
+
+<div class="content-wrapper">
+    <div style="width: 100%; text-align: center;"> <h1>Đơn hàng đã hoàn thành</h1> </div>
+    <br />
+    <div class="row">
+        <div class="col-lg-8 ">
+            <div class="row" id="phanloai">
+                <div class=" col-2"><p class="phanloaitheo">Phân loại theo</p></div>
+                <div class=" col-10">
+                    <!-- Dropdown phân loại theo phương thức thanh toán -->
+                    <div class="btn-group">
+                        <button id="paymentMethodButton" type="button" class="btn btn-outline-secondary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                            Phương thức thanh toán
+                        </button>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item filter-option" data-filter="paymentMethod" data-value="COD" style="color: black!important">COD</a>
+                            <a class="dropdown-item filter-option" data-filter="paymentMethod" data-value="VNPAY" style="color: black!important">VNPAY</a>
+                            <a class="dropdown-item filter-option" data-filter="paymentMethod" data-value="PayPal" style="color: black!important">PayPal</a>
+                        </div>
+                    </div>
+                    <!-- Dropdown phân loại theo trạng thái -->
+                    <div class="btn-group">
+                        <button id="statusButton" type="button" class="btn btn-outline-secondary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                            Trạng thái
+                        </button>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item filter-option" data-filter="status" data-value="6" style="color: black!important">Huỷ</a>
+                            <a class="dropdown-item filter-option" data-filter="status" data-value="5" style="color: black!important">Đã giao</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="input-group" style="margin-right: 10px; text-align: right;">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="search">
+                        <i class="mdi mdi-magnify"></i>
+                    </span>
+                </div>
+                <input id="searchInput" type="text" class="form-control" placeholder="Tìm kiếm hoá đơn theo mã hoá đơn."
+                       aria-label="search" aria-describedby="search">
+                <button id="searchButton" type="button" class="btn btn-inverse-secondary btn-sm">Tìm kiếm</button>
+            </div>
+        </div>
+
+        <div class="col-lg-12 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    
+                    <div id="ngoo">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Mã Hoá Đơn</th>
+                                    <th>Trạng Thái</th>
+                                    <th>Ngày Tạo</th>
+                                    <th>Phương Thức Thanh Toán</th>
+                                    <th>Tổng Tiền</th>
+                                    <th>Đánh Giá</th>
+                                    <th>Xem thêm</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var order in Model)
+                                {
+                                    <tr>
+                                        <td>@order.OrderId</td>
+                                        <td>@order.Status?.Name</td>
+                                        <td>@order.Date</td>
+                                        <td>@order.PaymentMethod?.Name</td>
+                                        <td>@order.TotalPrice</td>
+                                        <td>@order.CustomerFeeling</td>
+                                        <td>
+                                            <button type="button" class="btn btn-light btn-sm " onclick="showForm(@order.OrderId)" ><i class="mdi mdi-dots-vertical"></i></button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        <div id="overlayForm" class="overlay-form">
+                            <div class="overlay-content">
+                                <div id="formContent">
+                                    <!-- Nội dung chi tiết sẽ được load ở đây -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="orderListContainer">  
+                    </div>
+                    
+                </div>
+            </div>
+
+        </div>
+        
+    </div>
+</div>
+<div id="ngok">
+    @Html.PagedListPager(Model,
+            page => Url.Action("ListOldOrder", new { page = page }),
+            new PagedListRenderOptions
+    {
+        UlElementClasses = new[] { "pagination" },
+        LiElementClasses = new[] { "page-item" },
+        PageClasses = new[] { "page-link" }
+    })
+
+</div>
+<style>
+    .phanloaitheo{
+        height:100%;
+        align-content:center;
+        margin-bottom:0px;
+        text-align:center;
+    }
+    /* Overlay nền */
+    .overlay-form {
+        display: none; /* Ẩn mặc định */
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5); /* Màu nền đen mờ */
+        z-index: 1000;
+    }
+
+    /* Nội dung form */
+    .overlay-content {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        width: 50%; /* Độ rộng form */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .chitiet {
+        margin-top: 0px;
+        margin-bottom: 0;
+    }
+    /* Nút đóng form */
+
+    .close-btn {
+        color: red;
+        text-align: right;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    .custom-table th, .custom-table td {
+        padding: 15px; /* Tăng khoảng cách giữa các cột */
+        text-align: center; /* Căn giữa nội dung */
+    }
+
+    .custom-table th {
+        background-color: #f5f5f5; /* Màu nền cho tiêu đề */
+    }
+
+    .custom-table img {
+        display: block;
+        margin: 0 auto; /* Căn giữa hình ảnh */
+    }
+
+    .custom-table {
+        border-collapse: collapse; /* Gộp đường viền ô */
+        width: 100%; /* Tăng độ rộng toàn bảng */
+    }
+</style>
+
+
+<script>
+    $(document).ready(function () {
+        // Hàm xử lý tìm kiếm
+        function handleSearch() {
+            const searchKeyword = $('#searchInput').val().trim();
+            const page = 1;
+            console.log('keyword:', searchKeyword); // Debug giá trị statusId
+            if (!searchKeyword) {
+                alert("Vui lòng nhập từ khóa để tìm kiếm!");
+                return;
+            }
+
+            $.ajax({
+                url: '@Url.Action("searchOrder", "ManageOrder", new { area = "Admin" })', // Thay "YourControllerName" bằng tên Controller
+                type: 'GET',
+                data: { page: page, search_Keyword: searchKeyword },
+                success: function (response) {
+                    $('#orderListContainer').html(response); // Render kết quả vào vùng #orderList
+                },
+                error: function (xhr, status, error) {
+                    console.error("Lỗi:", error);
+                    alert("Đã xảy ra lỗi khi tìm kiếm hoá đơn!");
+                }
+            });
+        }
+
+        // Xử lý sự kiện click nút "Tìm kiếm"
+        $('#searchButton').click(function () {
+            handleSearch();
+            $('#ngoo').empty();
+            $('#ngok').empty();
+            $('#phanloai').empty();
+        });
+
+        // Xử lý sự kiện nhấn Enter trong ô input
+        $('#searchInput').keydown(function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                handleSearch();
+                $('#ngoo').empty();
+                $('#ngok').empty();
+                $('#phanloai').empty();
+            }
+        });
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        // Hàm gửi AJAX request
+        function filterOrders(filterType, filterValue) {
+            const page = 1; // Reset về trang đầu tiên khi lọc
+
+            $.ajax({
+                url: '@Url.Action("FilterOrder", "ManageOrder", new { area = "Admin" })',
+                type: 'GET',
+                data: {
+                    filterType: filterType,
+                    filterValue: filterValue,
+                    page: page
+                },
+                success: function (response) {
+                    $('#orderListContainer').html(response); // Render kết quả vào vùng #orderListContainer
+                    
+                },
+                error: function (xhr, status, error) {
+                    console.error("Lỗi:", error);
+                    alert("Đã xảy ra lỗi khi lọc hoá đơn!");
+                }
+            });
+        }
+
+        // Xử lý sự kiện click vào các filter-option (thẻ <a>)
+        $('.filter-option').click(function () {
+            const filterType = $(this).data('filter'); // Lấy loại filter (paymentMethod hoặc status)
+            console.log('type', filterType);
+            const filterValue = $(this).data('value'); // Lấy giá trị của filter (VD: "PayPal", "Cod", "Huỷ", "Đã giao")
+            console.log('type', filterValue);
+            // Gửi AJAX request với thông tin filter
+            filterOrders(filterType, filterValue);
+            $('#ngoo').empty();
+            $('#ngok').empty();
+        });
+    });
+</script>
+<script>
+    function showForm(orderId) {
+        // Hiển thị overlay form
+        document.getElementById('overlayForm').style.display = 'block';
+
+        // Load chi tiết đơn hàng qua AJAX (nếu cần thiết)
+        const formContent = document.getElementById('formContent');
+        formContent.innerHTML = `<p>Đang tải thông tin hóa đơn có mã: ${orderId}...</p>`; // Thông báo tạm thời
+        setTimeout(() => {
+            formContent.innerHTML = `
+                    <p><strong>Mã Hoá Đơn:</strong> ${orderId}</p>
+                    <p>Chi tiết đơn hàng sẽ được load từ server tại đây...</p>
+                `;
+            $.ajax({
+                url: `/Admin/ManageOrder/GetOrderDetail?orderId=${orderId}`,
+                type: 'GET',
+                success: function (data) {
+                    $('#formContent').html(data); // Hiển thị nội dung chi tiết
+
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error:', error); // Debug lỗi
+                    console.error('Response:', xhr.responseText);
+                    alert('Có lỗi khi tải dữ liệu chi tiết đơn hàng.');
+                }
+            });
+        }, 1500);
+
+
+        $(document).on('click', '.close-btn', function () {
+            $('#overlayForm').hide(); // Ẩn modal
+        });
+        
+    }
+
+   
+
+</script>

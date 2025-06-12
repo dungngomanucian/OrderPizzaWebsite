@@ -1,0 +1,166 @@
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@using Microsoft.AspNetCore.Http;
+@inject IHttpContextAccessor HttpContextAccessor
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Sixter's Pizza - Admin</title>
+    <!-- plugins:css -->
+    <link rel="stylesheet" href="../../LayoutAdmin1/vendors/mdi/css/materialdesignicons.min.css">
+    <link rel="stylesheet" href="../../LayoutAdmin1/vendors/base/vendor.bundle.base.css">
+    <!-- endinject -->
+    <!-- plugin css for this page -->
+    <link rel="stylesheet" href="../../LayoutAdmin1/vendors/datatables.net-bs4/dataTables.bootstrap4.css">
+    <!-- End plugin css for this page -->
+    <!-- inject:css -->
+    <link rel="stylesheet" href="../../LayoutAdmin1/css/style.css">
+    <!-- endinject -->
+    <link rel="shortcut icon" type="image/png" sizes="16x16" href="../../1LayoutIndex/assets/img/favicons/favicon-16x16.png">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+</head>
+<body>
+    <div class="container-scroller">
+        <!-- partial:partials/_navbar.html -->
+        <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
+            <div class="navbar-brand-wrapper d-flex justify-content-center">
+                <div class="navbar-brand-inner-wrapper d-flex justify-content-between align-items-center w-100">
+                    <a class="navbar-brand brand-logo" asp-area="Admin" asp-controller="HomeAdmin" asp-action="Index">
+                        <span class="menu-title">Công cụ Admin</span>
+                    </a>
+                    <a class="navbar-brand brand-logo-mini" asp-area="Admin" asp-controller="HomeAdmin" asp-action= "Index"><img src="../../1LayoutIndex/logo_web.jpg" alt="logo" /></a>
+                    <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
+                        <span class="mdi mdi-sort-variant"></span>
+                    </button>
+                </div>
+            </div>
+            <div class="navbar-menu-wrapper d-flex align-items-center justify-content-end">
+                @* <ul class="navbar-nav mr-lg-4 w-100">
+                    <li class="nav-item nav-search d-none d-lg-block w-100">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="search">
+                                    <i class="mdi mdi-magnify"></i>
+                                </span>
+                            </div>
+                            <input type="text" class="form-control" placeholder="Search now" aria-label="search" aria-describedby="search">
+                        </div>
+                    </li>
+                </ul> *@
+                <ul class="navbar-nav navbar-nav-right">
+                    
+                    <li class="nav-item nav-profile dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" id="profileDropdown">
+                            
+                            <span class="nav-profile-name">Welcome @HttpContextAccessor.HttpContext.Session.GetString("Email")!</span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">
+                       
+                            <a class="dropdown-item"  asp-controller="Login" asp-action="Logout">
+                                <i class="mdi mdi-logout text-primary"></i>
+                                Logout
+                            </a>
+                        </div>
+                    </li>
+                </ul>
+                <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-toggle="offcanvas">
+                    <span class="mdi mdi-menu"></span>
+                </button>
+            </div>
+        </nav>
+        <!-- partial -->
+        <div class="container-fluid page-body-wrapper">
+            <!-- partial:partials/_sidebar.html -->
+            <nav class="sidebar sidebar-offcanvas" id="sidebar">
+                <ul class="nav">
+                    <li class="nav-item">
+                        <a class="nav-link" asp-area="Admin" asp-controller="HomeAdmin" asp-action="Index"  >
+                            <i class="mdi mdi-home menu-icon"></i>
+                            <span class="menu-title">Trang chủ</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-area="Admin" asp-controller="ManageProduct" asp-action="ListProduct">
+                            <i class="mdi mdi-apps menu-icon"></i>
+                            <span class="menu-title">Quản lý sản phẩm </span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link collapsed" data-toggle="collapse" href="#ui-basic" aria-expanded="false" aria-controls="ui-basic">
+                            <i class="mdi mdi-animation menu-icon"></i>
+                            <span class="menu-title">Đơn hàng</span>
+                            <i class="menu-arrow"></i>
+                        </a>
+                        <div class="collapse" id="ui-basic" style="">
+                            <ul class="nav flex-column sub-menu">
+                                <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-controller="ManageOrder" asp-action="ListUnAcceptOrder"><i class="mdi mdi-new-box menu-icon"></i>Đơn hàng mới</a></li>
+                                <li class="nav-item"> <a class="nav-link" asp-area="Admin" asp-controller="ManageOrder" asp-action="ListOldOrder"><i class="mdi mdi-folder menu-icon"></i>Đơn hàng cũ</a></li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link collapsed" data-toggle="collapse" href="#autho" aria-expanded="false" aria-controls="autho">
+                            <i class="mdi mdi-percent menu-icon"></i>
+                            <span class="menu-title">Voucher</span>
+                            <i class="menu-arrow"></i>
+                        </a>
+                        <div class="collapse" id="autho" style="">
+                            <ul class="nav flex-column sub-menu" >
+                                <li class="nav-item"> <a class="nav-link" asp-area="Admin" asp-controller="ManageVoucher" asp-action="AddVoucher"><i class="mdi mdi-bookmark-plus-outline menu-icon"></i>Thêm voucher mới</a></li>
+                                <li class="nav-item"> <a class="nav-link" asp-area="Admin" asp-controller="ManageVoucher" asp-action="ListVoucher" asp-route-state="1"><i class="mdi mdi-swap-vertical menu-icon"></i>Voucher hiện hành</a></li>
+                                <li class="nav-item"> <a class="nav-link" asp-area="Admin" asp-controller="ManageVoucher" asp-action="ListVoucher" asp-route-state="2"><i class="mdi mdi-sync-off menu-icon"></i>Voucher vô hiệu hoá</a></li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-area="Admin" asp-controller="ManageUser" asp-action="ManageAdmin">
+                            <i class="mdi mdi-account-multiple menu-icon"></i>
+                            <span class="menu-title">Admin</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            <!-- partial -->
+            <div class="main-panel">
+                @RenderBody()
+            </div>
+           
+            
+            <!-- main-panel ends -->
+        </div>
+        <!-- page-body-wrapper ends -->
+    </div>
+    <!-- container-scroller -->
+    <!-- plugins:js -->
+    <script src="../../LayoutAdmin1/vendors/base/vendor.bundle.base.js"></script>
+    <!-- endinject -->
+    <!-- Plugin js for this page-->
+    <script src="../../LayoutAdmin1/vendors/chart.js/Chart.min.js"></script>
+    <script src="../../LayoutAdmin1/vendors/datatables.net/jquery.dataTables.js"></script>
+    <script src="../../LayoutAdmin1/vendors/datatables.net-bs4/dataTables.bootstrap4.js"></script>
+    <!-- End plugin js for this page-->
+    <!-- inject:js -->
+    <script src="../../LayoutAdmin1/js/off-canvas.js"></script>
+    <script src="../../LayoutAdmin1/js/hoverable-collapse.js"></script>
+    <script src="../../LayoutAdmin1/js/template.js"></script>
+    <!-- endinject -->
+    <!-- Custom js for this page-->
+    <script src="../LayoutAdmin1/js/dashboard.js"></script>
+    <script src="../LayoutAdmin1/js/data-table.js"></script>
+    <script src="../LayoutAdmin1/js/jquery.dataTables.js"></script>
+    <script src="../LayoutAdmin1/js/dataTables.bootstrap4.js"></script>
+    <!-- End custom js for this page-->
+</body>
+
+</html>
+<style>
+    .ul{
+        list-style-type:none;
+    }
+</style>

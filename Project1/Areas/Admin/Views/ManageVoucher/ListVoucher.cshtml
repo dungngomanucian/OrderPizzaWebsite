@@ -1,0 +1,364 @@
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@using Project1.Models;
+@model List<TVoucher>
+@{
+    ViewData["Title"] = "ListProduct";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin1.cshtml";
+}
+
+<br />
+
+<div class="content-wrapper">
+    <div class="row">
+        @if (ViewBag.Null == "List thành công")
+        {
+            <h3 class="tilte_voucher">
+                --------------------------Voucher giảm giá cố định--------------------------
+                <button type="button" class="btn btn-outline-primary btn-sm btn-toggle" onclick="toggleList('fixed-discount-list')">
+                    Ẩn/Hiện
+                </button>
+
+            </h3>
+        }
+        else if (ViewBag.Null == "Không có voucher nào bị hết hạn hoặc hết số lượng")
+        {
+            <div class="alert alert-warning r">
+                @ViewBag.Null
+            </div>
+        }
+        else
+        {
+            <h3 class="tilte_voucher">
+                --------------------------Voucher giảm giá cố định--------------------------
+                <button type="button" class="btn btn-outline-primary btn-sm btn-toggle" onclick="toggleList('fixed-discount-list')">
+                    Ẩn/Hiện
+                </button>
+            </h3>
+        }
+
+
+        <div class="row" id="fixed-discount-list">
+            @foreach (var item in Model)
+            {
+                @if (item.IsPercentDiscountType == false)
+                {
+                    <div class="col-lg-3 grid-margin stretch-card">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-12 ma-don-hang">
+                                        <h3>Mã Voucher: @item.VoucherId</h3>
+                                        <h5>Trạng thái: @item.Code</h5>
+                                    </div>
+                                    <div class="col-12 image">
+                                        <img class="logo" src="../../1LayoutIndex/logo_web.jpg" />
+                                    </div>
+                                </div>
+                                <div class="row noi-dung-order">
+                                    <div class="col-12">
+                                        <small class="text-muted">
+                                            Số lượng: @item.Number <br />
+                                            Giá trị tối thiểu để áp dụng: @item.MinOrderValue <br />
+                                            Giảm: @item.DiscountValue <br />
+                                            Giảm tối đa: @item.MaxDiscountValue
+                                        </small>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    @if (item.Deleted == false) //nếu voucher chưa bị vô hiệu hoá
+                                    {
+                                        <a class="btn btn-inverse-secondary btn-sm btn-vohieu"
+                                           asp-controller="ManageVoucher"
+                                           asp-action="DeActiveVoucher"
+                                           asp-route-voucherId="@item.VoucherId" onclick="return confirmDeactivation(event);">
+                                            Vô hiệu hoá voucher này
+                                        </a>
+
+                                    }
+                                    else //nếu voucher đã bị vô hiệu hoá
+                                    {
+                                        <btn class="btn btn-inverse-secondary btn-sm btn-vohieu" onclick="showForm(@item.VoucherId)">
+                                            Hồi sinh voucher này
+                                        </btn>
+
+                                        <div id="overlayForm" class="overlay-form">
+                                            <div class="overlay-content">
+                                                <div id="formContent">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+
+    <div class="row">
+        @if (ViewBag.Null == "List thành công")
+        {
+
+            <h3 class="tilte_voucher">
+                --------------------------Voucher giảm giá theo phần trăm--------------------------
+                <button type="button" class="btn btn-outline-primary btn-sm btn-toggle" onclick="toggleList('percent-discount-list')">
+                    Ẩn/Hiện
+                </button>
+            </h3>
+        }
+        else if (ViewBag.Null == "Không có voucher nào bị hết hạn hoặc hết số lượng") { }
+        else
+        {
+            <h3 class="tilte_voucher">
+                --------------------------Voucher giảm giá theo phần trăm--------------------------
+                <button type="button" class="btn btn-outline-primary btn-sm btn-toggle" onclick="toggleList('percent-discount-list')">
+                    Ẩn/Hiện
+                </button>
+            </h3>
+        }
+        <div class="row" id="percent-discount-list">
+            @foreach (var item in Model)
+            {
+                @if (item.IsPercentDiscountType == true)
+                {
+                    <div class="col-lg-3 grid-margin stretch-card">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-12 ma-don-hang">
+                                        <h3>Mã Voucher: @item.VoucherId</h3>
+                                        <h5>Trạng thái: @item.Code</h5>
+                                    </div>
+                                    <div class="col-12 image">
+                                        <img class="logo" src="../../1LayoutIndex/logo_web.jpg" />
+                                    </div>
+                                </div>
+                                <div class="row noi-dung-order">
+                                    <div class="col-12">
+                                        <small class="text-muted">
+                                            Số lượng: @item.Number <br />
+                                            Giá trị tối thiểu để áp dụng: @item.MinOrderValue <br />
+                                            Giảm: @item.DiscountValue <br />
+                                            Giảm tối đa: @item.MaxDiscountValue
+                                        </small>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    @if (item.Deleted == false) //nếu voucher chưa bị vô hiệu hoá
+                                    {
+                                        <a class="btn btn-inverse-secondary btn-sm btn-vohieu"
+                                           asp-controller="ManageVoucher"
+                                           asp-action="DeActiveVoucher"
+                                           asp-route-voucherId="@item.VoucherId" onclick="return confirmDeactivation(event);">
+                                            Vô hiệu hoá voucher này
+                                        </a>
+
+                                    }
+                                    else //nếu voucher đã bị vô hiệu hoá
+                                    {
+                                        <btn class="btn btn-inverse-secondary btn-sm btn-vohieu" onclick="showForm(@item.VoucherId)">
+                                            Hồi sinh voucher này
+                                        </btn>
+
+                                        <div id="overlayForm" class="overlay-form">
+                                            <div class="overlay-content">
+                                                <div id="formContent">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleList(listId) {
+        const list = document.getElementById(listId);
+        if (list.style.display === "none" || list.style.display === "") {
+            list.style.display = "flex"; // Hiển thị danh sách
+        } else {
+            list.style.display = "none"; // Ẩn danh sách
+        }
+    }
+</script>
+<script>
+    function showForm(voucherId) {
+        // Hiển thị overlay form
+        document.getElementById('overlayForm').style.display = 'block';
+
+        // Load chi tiết đơn hàng qua AJAX (nếu cần thiết)
+        const formContent = document.getElementById('formContent');
+        formContent.innerHTML = `<p>Đang tải form cập nhật voucher có mã: ${voucherId}...</p>`; // Thông báo tạm thời
+        setTimeout(() => {
+            formContent.innerHTML = `--------------------------------------------------`;
+            $.ajax({
+                url: `/Admin/ManageVoucher/GetVoucherIn4?voucherId=${voucherId}`,
+                type: 'GET',
+                success: function (data) {
+                    $('#formContent').html(data); // Hiển thị nội dung chi tiết
+
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error:', error); // Debug lỗi
+                    console.error('Response:', xhr.responseText);
+                    alert('Có lỗi khi tải dữ liệu chi tiết đơn hàng.');
+                }
+            });
+        }, 1000);
+
+
+        $(document).on('click', '.close-btn', function () {
+            $('#overlayForm').hide(); // Ẩn modal
+        });
+
+    }
+
+
+
+</script>
+<script>
+    function confirmDeactivation(event) {
+        // Hiển thị hộp thoại xác nhận
+        const isConfirmed = confirm("Bạn có chắc chắn muốn vô hiệu hóa voucher này?");
+
+        // Nếu người dùng không xác nhận, ngăn chặn hành động mặc định (điều hướng)
+        if (!isConfirmed) {
+            event.preventDefault();
+        }
+
+        // Trả về trạng thái xác nhận (true/false)
+        return isConfirmed;
+    }
+</script>
+<style>
+    /*phần này xử lý component voucher*/
+    .card {
+        width: 80%;
+        text-align: center;
+        margin: 0 auto
+    }
+
+    .row1 {
+        width: 100%;
+        text-align: center;
+        margin: 0 auto;
+    }
+
+    .col-3 {
+        padding: 10px;
+        border-radius: 5px 5px 5px 5px;
+    }
+
+    .nav-status-container {
+        padding: 0px;
+    }
+
+    .col-3:last-child {
+        border-right: none;
+    }
+
+    .ma-don-hang {
+        margin: auto 0;
+        text-align: center;
+    }
+
+    .image {
+        margin: auto 0;
+        padding-left: 0px;
+    }
+
+    .logo {
+        width: 60%;
+        height: 60%;
+        object-fit: cover;
+    }
+
+    .noi-dung-order {
+        text-align: center;
+        margin: auto 0;
+    }
+
+    .btn-vohieu {
+        align-items: center;
+        text-align: center;
+        width: 100%;
+        height: 100%;
+        margin: 0 auto;
+    }
+
+    .btn-detail {
+        width: 100%;
+        height: 100%;
+        margin: 0 auto;
+    }
+
+    .col-12 {
+        margin-bottom: 10px;
+    }
+
+    .tilte_voucher {
+        margin: 0 auto;
+        padding-bottom: 10px;
+    }
+
+    /* Phần này xử lý hiện form phủ */
+    /* Overlay nền */
+    .align-items-center {
+        font-size: 20px;
+        margin-bottom: 0px;
+        align-content: center;
+    }
+
+    .overlay-form {
+        display: none; /* Ẩn mặc định */
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5); /* Màu nền đen mờ */
+        z-index: 1000;
+    }
+
+    /* Nội dung form */
+    .overlay-content {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        width: 15%; /* Độ rộng form */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Nút đóng form */
+    .close-btn {
+        color: red;
+        text-align: right;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    /*phần này xử lý đóng mở danh sách*/
+    #fixed-discount-list, #percent-discount-list {
+        display: flex; /* Mặc định hiển thị dạng lưới */
+        flex-wrap: wrap; /* Cho phép các phần tử gấp dòng */
+    }
+
+</style>
+
