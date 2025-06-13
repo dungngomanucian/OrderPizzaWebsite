@@ -16,4 +16,5 @@
 
 Thay thế phần trong dấu ngoặc kép bằng connection string của database mới tạo ở bước 1, ví dụ:
 optionsBuilder.UseSqlServer("Data Source=MY-SERVER\\SQLEXPRESS;Initial Catalog=PizzaOnline;User ID=sa;Password=...");
- 3. Mở Visual Studio → Build → Run (F5) để khởi động website. Ứng dụng sẽ chạy và kết nối với database của bạn.
+ 3. **Khởi chạy dự án** 
+ Mở Visual Studio → Build → Run (F5) để khởi động website. Ứng dụng sẽ chạy và kết nối với database.
